@@ -1,4 +1,19 @@
-<apex:page controller="CurrentTournament" cache="false">
+<apex:page controller="CurrentTournament" cache="true">
+    <style>
+        .thisLinks:link, thisLinks:visited{ 
+            background-color: white;
+            color: black;
+            border: 2px solid #a3f1ff;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;        
+        }
+        .thisLinks:hover{
+            background-color: #a3f1ff;
+            color: white;
+         }
+    </style>
     <apex:pageBlock rendered="{!currentTournament != null}">
         <apex:pageMessages /> 
         <apex:pageBlockSection columns="1">
@@ -17,9 +32,7 @@
 <apex:pageBlock title="It's Single tournament, that all fields which you can see now" rendered="{!currentTournament.Player_Type__c =='Single'}">
         <apex:pageBlockSection columns="1" Title="All players who has registered at this tournament">    
             <apex:pageBlockTable value="{!allRegisteredPlayers}" var="thisPlayer">
-                <apex:column value="{!thisPlayer.Id}"/>
                 <apex:column value="{!thisPlayer.Name}"/>
-                <apex:column value="{!thisPlayer.Email__c}"/>
             </apex:pageBlockTable>
         </apex:pageBlockSection>
         <apex:form rendered="{!checkCookie && currentTournament.Status__c = 'UPCOMING'}">
@@ -59,26 +72,54 @@
         <apex:pageblock title="Sign in Tournament" rendered="{!checkCookie==false}">
             If you want sign in tournament, first that you need -> <apex:outputLink value="simpleLogin">sign in system</apex:outputLink>    
         </apex:pageblock>
-        <apex:pageBlockSection columns="1" title="Single schedule tournament" rendered="{!actualTournamentType=='Single Elimination'}">
-            <apex:pageBlockTable value="{!singleEliminationGrid}" var="thisRound">
-                <apex:column >
-                    <apex:pageBlockTable value="{!thisRound}" var="thisGame">
-                        <apex:column value="{!thisGame.Name}" rendered="{!getStatusPlayer}"/>
-                        <apex:column value="{!thisGame.Player_one__c}"/>
-                        <apex:column value="{!thisGame.Player_two__c}"/>
-                        <apex:column value="{!thisGame.FirstPlayerGoals__c}"/>
-                        <apex:column value="{!thisGame.SecondPlayerGoals__c}"/>
-                        <apex:column value="{!thisGame.Stage__c}"/>
-                        <apex:column headerValue="Links to every game">
-                            <apex:outputLink value="Game?id={!thisGame.Id}">Click here</apex:outputLink> 
-                        </apex:column>
-                    </apex:pageBlockTable>    
+        <apex:pageBlock mode="maindetail" title="Single schedule tournament" rendered="{!actualTournamentType=='Single Elimination' && (currentTournament.Status__c == 'IN PROGRESS' || currentTournament.Status__c =='COMPLETE')}">
+            <apex:pageBlockTable value="{!currentTournament}" var="oneTime">
+                <apex:column width="25%" headerValue="">
+                    <apex:repeat value="{!SEround1}" var="round" rendered="{!SEround1 !=null}">
+                        <apex:pageBlock ><center>
+                            <apex:outputField value="{!round.Player_one__c}"/>(<apex:outputField value="{!round.FirstPlayerGoals__c}"/>) <br/><br/>
+                            <apex:outputLink styleClass="thisLinks" value="Game?id={!round.Id}">VS</apex:outputLink><br/><br/> 
+                            <apex:outputField value="{!round.Player_two__c}"/>(<apex:outputField value="{!round.SecondPlayerGoals__c}"/>) 
+                            </center>
+                        </apex:pageBlock>
+                    </apex:repeat>                
                 </apex:column>
-             </apex:pageBlockTable>
-        </apex:pageBlockSection>
+                <apex:column width="25%" headerValue="">
+                    <apex:repeat value="{!SEround2}" var="round" rendered="{!SEround2 !=null}">
+                        <apex:pageBlock ><center>
+                            <apex:outputField styleClass="thisFields" value="{!round.Player_one__c}"/>(<apex:outputField styleClass="thisFields" value="{!round.FirstPlayerGoals__c}"/>)<br/><br/>
+                            <apex:outputLink styleClass="thisLinks" value="Game?id={!round.Id}">VS</apex:outputLink><br/> <br/>
+                            <apex:outputField styleClass="thisFields" value="{!round.Player_two__c}"/>(<apex:outputField styleClass="thisFields" value="{!round.SecondPlayerGoals__c}"/>) 
+                            
+                            </center>
+                        </apex:pageBlock>
+                    </apex:repeat>
+                </apex:column>
+                <apex:column width="25%" headerValue="">
+                    <apex:repeat value="{!SEround3}" var="round" rendered="{!SEround3 !=null}">
+                        <apex:pageBlock ><center>
+                            <apex:outputField value="{!round.Player_one__c}"/>(<apex:outputField value="{!round.FirstPlayerGoals__c}"/>) <br/><br/>
+                            <apex:outputLink styleClass="thisLinks" value="Game?id={!round.Id}">VS</apex:outputLink><br/><br/> 
+                            <apex:outputField value="{!round.Player_two__c}"/>(<apex:outputField value="{!round.SecondPlayerGoals__c}"/>) 
+                            </center>
+                        </apex:pageBlock>
+                    </apex:repeat>
+                </apex:column>
+                <apex:column width="25%" headerValue="" rendered="{!SEround4 !=null}">
+                    <apex:repeat value="{!SEround4}" var="round">
+                        <apex:pageBlock ><center>
+                            <apex:outputField value="{!round.Player_one__c}"/>(<apex:outputField value="{!round.FirstPlayerGoals__c}"/>) <br/><br/>
+                            <apex:outputLink styleClass="thisLinks" value="Game?id={!round.Id}">VS</apex:outputLink><br/> <br/>
+                            <apex:outputField value="{!round.Player_two__c}"/>(<apex:outputField value="{!round.SecondPlayerGoals__c}"/>) 
+                            </center>
+                        </apex:pageBlock>
+                    </apex:repeat>
+                </apex:column>                                
+            </apex:pageBlockTable>
+        </apex:pageBlock>
         <apex:pageBlock rendered="{!actualTournamentType=='Double Elimination'}">
             <apex:pageBlockTable value="{!allRegisteredPlayers}" var="thisPlayer">
-                <apex:column headerValue="Round 1">{!thisPlayer.Id} : {!thisPlayer.Name}</apex:column>
+                <apex:column headerValue="Round 1">{!thisPlayer.Name}</apex:column>
                 <apex:column headerValue="Round 2"></apex:column>
                 <apex:column headerValue="Round 3"></apex:column>x`>
                 <apex:column headerValue="Final"></apex:column>
@@ -87,7 +128,7 @@
         </apex:pageBlock>
         <apex:pageBlock title="Final result" mode="maindetail" rendered="{!actualTournamentType=='Round-robin tournament'}">
             <apex:pageBlockTable value="{!allRegisteredPlayers}" var="thisPlayer">
-                <apex:column headerValue="Player" width="270px">{!thisPlayer.Id} : {!thisPlayer.Name}</apex:column>
+                <apex:column headerValue="Player" width="270px">{!thisPlayer.Name}</apex:column>
                 <apex:repeat value="{!allRegisteredPlayers}" var="thisOpponentPlayer">
                     <apex:column >
                         <apex:facet name="header">{!thisOpponentPlayer.Name}</apex:facet>
@@ -100,16 +141,7 @@
                     </apex:column>
                 </apex:repeat>
             </apex:pageBlockTable>
-            <apex:pageBlocktable value="{!RRGrid}" var="rrrg">
-                <apex:column >
-                    <apex:pageBlockTable value="{!rrrg}" var="thisrrrg">
-                        <apex:column >
-                            <apex:facet name="header">{!thisrrrg.FirstPlayerGoals__c}</apex:facet>
-                            <apex:outputText >{!thisrrrg.FirstPlayerGoals__c}</apex:outputText>
-                        </apex:column>
-                    </apex:pageBlockTable>
-                </apex:column>
-            </apex:pageBlocktable>    
+              
         </apex:pageBlock>
 </apex:pageBlock> 
 <apex:pageBlock title="It's Team tournament, that all fields which you can see now" rendered="{!currentTournament.Player_Type__c =='Team'}">

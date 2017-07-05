@@ -14,6 +14,10 @@ public class CurrentTournament implements ICurrentTournament{
         if(singleEliminationGrid == null) singleEliminationGrid  = new List<List<Game__c>>();
         return singleEliminationGrid ;}
         set;}
+    public List<Game__c> SEround1{get;set;}
+    public List<Game__c> SEround2{get;set;}
+    public List<Game__c> SEround3{get;set;}
+    public List<Game__c> SEround4{get;set;}
     public List<List<Game__c>> RRGrid{get{
         if(RRGrid== null) RRGrid= new List<List<Game__c>>();
         return RRGrid;
@@ -36,6 +40,18 @@ public class CurrentTournament implements ICurrentTournament{
             getActualCountTounamentPlayers = fullTournament();
             allCurrentGames= getCurrentGames(); 
             singleEliminationGrid = makeGridOfSingleTournament();
+            if(singleEliminationGrid.size() !=null && singleEliminationGrid.size()>0){
+                SEround1 = singleEliminationGrid.get(0);
+                if(singleEliminationGrid.size()>1){
+                SEround2 = singleEliminationGrid.get(1);
+                    if(singleEliminationGrid.size()>2){
+                    SEround3 = singleEliminationGrid.get(2);
+                    if(singleEliminationGrid.size()>3){
+                        SEround4 = singleEliminationGrid.get(3);
+                        }else{SEround4  = new List<Game__c>();}
+                    }else{SEround3  = new List<Game__c>();}
+                }else{SEround2  = new List<Game__c>();}
+            }else{SEround1  = new List<Game__c>();}
             RRGrid = makeGridOfRRTournament();
         }else{singleEliminationGrid  = new List<List<Game__c>>();
               RRGrid = new List<List<Game__c>>();}
@@ -96,15 +112,14 @@ public class CurrentTournament implements ICurrentTournament{
                 if(listPlayerTournament.size() == 0){
                     try{
                         insert playerTournamentJunctionObject;
+                         ApexPages.addMessage(new ApexPages.message(ApexPages.severity.CONFIRM,'Congratulations, now you take part Tournament. If you want to see change, pls reload your page'));
                     }
                     catch(DMLException e){}
                 }
             }
              
         }
-        PageReference pageRef = ApexPages.currentPage();      
-        pageRef.setRedirect(true);
-        return pageRef;    
+        return null;    
     }
     
     public PageReference RemoveTournamentPart(){
@@ -120,14 +135,13 @@ public class CurrentTournament implements ICurrentTournament{
                 try{
                     playerTournamentJunctionObject = listPlayerTournament.get(0);
                     Database.delete(playerTournamentJunctionObject);
+                    ApexPages.addMessage(new ApexPages.message(ApexPages.severity.CONFIRM,'Now you don\'t take part at this Tournament. If you want to see change, pls reload your page'));
                 }
                 catch(DMLException e){}
             }
         
         }
-        PageReference pageRef = ApexPages.currentPage();      
-        pageRef.setRedirect(true);
-        return pageRef;
+        return null;
     }
     
     public Integer fullTournament(){
@@ -157,8 +171,6 @@ public class CurrentTournament implements ICurrentTournament{
     }
     
     public PageReference startTournament(){
-        PageReference pageRef = ApexPages.currentPage();      
-        pageRef.setRedirect(true);
         Tournament__c thisTournament = getTournament();
         List<Tournament__c> tournamentList = [Select Status__c from Tournament__c where Status__c = 'IN PROGRESS'];
         if(tournamentList.size()>0){
@@ -179,6 +191,7 @@ public class CurrentTournament implements ICurrentTournament{
             }*/        
             
             try{upsert thisTournament;
+                ApexPages.addMessage(new ApexPages.message(ApexPages.severity.CONFIRM,'Congratulations you start this Tournament.Reload your page'));
                 try{
                  System.schedule('Remember to play each games', '0 1 * * * ?', new RememberYourGames());
                 } 
@@ -190,14 +203,14 @@ public class CurrentTournament implements ICurrentTournament{
             
         }
         
-        return pageRef;
+        return ApexPages.currentPage().setRedirect(true);
     }
     
     public void startRoundRobinTournament(){
         List<Game__c> thisGames = new List<Game__c>();
         if(getTournament() !=null && fullTournament() !=null && getTournament() !=null && getAllRegisteredPlayers() !=null && getTournament().Player_type__c !=null && getTournament().Player_type__c == 'Single'){                
-            for(Integer round=0; round<fullTournament()+1;round++){
-                for(Integer match=round+1;match<fullTournament();match++){
+            for(Integer round=0; round<fullTournament();round++){
+                for(Integer match=round+1;match<fullTournament()-1;match++){
                         Game__c currentGame = new Game__c();
                         currentGame.Player_one__c = getAllRegisteredPlayers().get(round).Id ; 
                         currentGame.Player_two__c = getAllRegisteredPlayers().get(match).Id ;
@@ -213,72 +226,63 @@ public class CurrentTournament implements ICurrentTournament{
     }
     
     public void startSingleEliminationTournament(){
-        List<Game__c> thisGames = new List<Game__c>();
-        Integer i = 0;
-        for(Integer j = 1; j<=fullTournament(); j *=2){
-            i = j;
-        }
-        
-        if(math.mod(fullTournament(),i)==0){
-            if(getTournament().Type_of_Elimination_Tournament__c!=null && getTournament().Type_of_Elimination_Tournament__c == 'Single Elimination'){
-                for(Integer round=0; round<=fullTournament()-i;round +=2){
-                    Integer match=round+1;
-                    Game__c currentGame = new Game__c();
-                    currentGame.Player_one__c = getAllRegisteredPlayers().get(round).Id ; 
-                    currentGame.Player_two__c = getAllRegisteredPlayers().get(match).Id ;
-                    currentGame.FirstPlayerGoals__c = 0;
-                    currentGame.SecondPlayerGoals__c = 0;
-                    currentGame.Stage__c = 1;
-                    currentGame.TournamentGame__c = getTournament().Id;
-                    thisGames.add(CurrentGame);
-                }
-            }
-        }
-        else{
         //additional round
-            if(getTournament().Type_of_Elimination_Tournament__c == 'Single Elimination'){
-                for(Integer round=0; round<=fullTournament()-i;round +=2){
-                    Integer match=round+1;
-                    Game__c currentGame = new Game__c();
-                    currentGame.Player_one__c = getAllRegisteredPlayers().get(round).Id ; 
-                    currentGame.Player_two__c = getAllRegisteredPlayers().get(match).Id ;
-                    currentGame.FirstPlayerGoals__c = 0;
-                    currentGame.SecondPlayerGoals__c = 0;
-                    currentGame.TournamentGame__c = getTournament().Id;           
-                    currentGame.Stage__c = 1;
-                    thisGames.add(CurrentGame);
-                }
-                Integer k = 2*i-fullTournament();
-                Id freeSlot = [Select ID,Name, Email__c From Player__c Where Email__c='www@gmail.com'].Id;
-                for(Integer nextRound = fullTournament()-1; k>0; nextRound--){
-                    Game__c currentGame = new Game__c();
-                    currentGame.Player_one__c = getAllRegisteredPlayers().get(nextRound).Id ; 
-                    currentGame.Player_two__c = freeSlot;
-                    currentGame.FirstPlayerGoals__c = 2;
-                    currentGame.SecondPlayerGoals__c = 0;
-                    currentGame.isFPAccepted__c = true;
-                    currentGame.isSPAccepted__c = true;
-                    currentGame.Stage__c = 1;
-                    currentGame.TournamentGame__c = getTournament().Id;
-                    thisGames.add(CurrentGame);
-                    k--;    
-                }
+        if(getTournament().Type_of_Elimination_Tournament__c == 'Single Elimination'){
+            List<Game__c> thisGames = new List<Game__c>();
+            Integer i = 0;
+            for(Integer j = 1; j<=fullTournament(); j *=2){
+                i = j;
+            }
+            Integer z;
+            if(i == fullTournament()){z = 0;}
+            else{z = 2*i-fullTournament();}
+            for(Integer round=0; round<fullTournament()-z;round +=2){
+                Integer match=round+1;
+                Game__c currentGame = new Game__c();
+                currentGame.Player_one__c = getAllRegisteredPlayers().get(round).Id ; 
+                currentGame.Player_two__c = getAllRegisteredPlayers().get(match).Id ;
+                currentGame.FirstPlayerGoals__c = 0;
+                currentGame.SecondPlayerGoals__c = 0;
+                currentGame.TournamentGame__c = getTournament().Id;           
+                currentGame.Stage__c = 1;
+                thisGames.add(CurrentGame);
+            }
+        if(i != fullTournament()){    
+            Integer k = 2*i-fullTournament();
+            Id freeSlot = [Select ID,Name, Email__c From Player__c Where Email__c='www@gmail.com'].Id;
+            for(Integer nextRound = fullTournament()-1; k>0; nextRound--){
+                Game__c currentGame = new Game__c();
+                currentGame.Player_one__c = getAllRegisteredPlayers().get(nextRound).Id ; 
+                currentGame.Player_two__c = freeSlot;
+                currentGame.FirstPlayerGoals__c = 2;
+                currentGame.SecondPlayerGoals__c = 0;
+                currentGame.isFPAccepted__c = true;
+                currentGame.isSPAccepted__c = true;
+                currentGame.Stage__c = 1;
+                currentGame.TournamentGame__c = getTournament().Id;
+                thisGames.add(CurrentGame);
+                k--;    
             }
         }
-        
-        
+           
         try{upsert thisGames;}
-        catch(DMLException e){}
-        
+        catch(DMLException e){}       
+        }
     }
      
-    public PageReference finishTournament(){    
-        PageReference pageRef = ApexPages.currentPage();      
-        pageRef.setRedirect(true);
+    public PageReference finishTournament(){ 
         Tournament__c thisTournament = getTournament(); 
         thisTournament.Status__c  = 'COMPLETE';
-        update thisTournament;
-        return pageRef;
+        pagereference p = apexpages.Currentpage();
+        apexpages.Message msg ;
+        try{update thisTournament;
+            msg = new Apexpages.Message(ApexPages.Severity.Info,'Now this tournament has already finished. If you want to see change, pls reload your page');
+            }
+        catch(DMLException e){
+             msg = new Apexpages.Message(ApexPages.severity.ERROR,'ERROR FINISHING THIS TOURNAMENT');
+            }
+        apexpages.addmessage(msg);
+        return p;
     }
     
     public List<Game__c> getCurrentGames(){

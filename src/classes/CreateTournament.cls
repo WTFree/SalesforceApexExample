@@ -41,11 +41,13 @@ public class CreateTournament{
         }}
         try {
              Database.insert(tournament);
+            sendNewTournamentEmail();
+            ApexPages.addMessage(new ApexPages.message(ApexPages.severity.CONFIRM,'Congratulations you create new Tournament'));
         } catch (DMLException e) {
             ApexPages.addMessage(new ApexPages.message(ApexPages.severity.ERROR,'Error creating new tournament.'));
             return null;
         }
-        return pageRef ;
+        return null;
     }
     
     public boolean isModeratorPlayer(){
@@ -77,7 +79,8 @@ public class CreateTournament{
             ApexPages.addMessage(new ApexPages.message(ApexPages.severity.ERROR,'Error update this tournament.'));
             return null;
         }
-        return Page.UpdateTournament;
+        ApexPages.addMessage(new ApexPages.message(ApexPages.severity.CONFIRM,'Congratulations you update this Tournament'));
+        return null;
     }
     
     public PageReference deleteTournament(){
@@ -91,16 +94,11 @@ public class CreateTournament{
         return pageRef;
     }
     
-    public void sendNewTournamentEmail(){    
-        List<Player__c> allPlayersEmails = [Select Email__c From Player__c];
-        for(Player__c p : allPlayersEmails){
-            if(p.Email__c !=null){
+    public void sendNewTournamentEmail(){
                 List < String > toAddresses = new List < String > ();
                 List < String > CcAddresses = new List < String > ();
                 Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                toAddresses.add(p.Email__c);
                 ccAddresses.add('vitaly.gaiduchok@gmail.com');
-                mail.setToAddresses(toAddresses);
                 mail.setCcAddresses(CcAddresses);
                 mail.setSenderDisplayName('Check our new Tournament, Vialy Gaoduchok');
                 mail.setSubject('Check our new Tournament, Vialy Gaoduchok');
@@ -109,8 +107,7 @@ public class CreateTournament{
                 mail.setPlainTextBody('Test');
                 mail.setHtmlBody('New tournament has been created, you can join to this tournament. Pls watch at our schedule tournaments<br/><a href="http://gaiduchokttt-developer-edition.eu11.force.com/RepresentTableTennisTournament"> CLICK HERE </a>');
                 Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
-           }
-        }
+          
     }
     
 }

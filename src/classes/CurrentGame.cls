@@ -3,7 +3,7 @@ public class CurrentGame implements ICurrentGame{
     public boolean writeResultThisMatch{get;set;}
     public boolean allowForAcceptPlayerOne{get;set;} 
     public boolean allowForAcceptPlayerTwo{get;set;} 
-    public boolean getStatusPlayer{get;set;}//can remove, but problem on site side, c.eu11... all ok. But on side from site problem need to fix
+    public boolean isModerator{get;set;}
     
     public Tournament__c currentTournament{
         get{
@@ -56,7 +56,7 @@ public class CurrentGame implements ICurrentGame{
             writeResultThisMatch = getAllowsForCurrentPlayer();
             playerOne = getCurrentPlayerOne(); 
             playerTwo = getCurrentPlayerTwo();
-            getStatusPlayer = currentPlayer.isModerator__c;
+            isModerator = currentPlayer.isModerator__c;
         }
     }
     
@@ -81,6 +81,11 @@ public class CurrentGame implements ICurrentGame{
         return [Select Id, Name, Email__c, isModerator__c From Player__c Where Email__c = :ApexPages.currentPage().getCookies().get('PlayerSession').getValue()];
         return new Player__c();
     }
+    
+    private boolean getIsModerator(Player__c thisPlayer){
+        return thisPlayer.isModerator__c;
+    }
+    
     public Player__c getCurrentPlayerOne(){
         if(ApexPages.currentPage().getCookies().get('PlayerSession').getValue() !=null)
         return [Select Id, Name From Player__c
@@ -97,7 +102,7 @@ public class CurrentGame implements ICurrentGame{
    }
     
     public void submitResult(){
-        if(getAllowsForCurrentPlayer()||getCurrentPlayer().isModerator__c){
+        if((getCurrentTournament().Status__c!=null && (getCurrentTournament().Status__c !='COMPLETE' && getAllowsForCurrentPlayer()))||getCurrentPlayer().isModerator__c){
             acceptResult();
             try{update(currentGame);}
             catch(DMLException E){} 
