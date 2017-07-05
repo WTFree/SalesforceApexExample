@@ -1,0 +1,20 @@
+<apex:page controller="PersonalPage">
+    <apex:pageBlock title="Personal Information">
+        <apex:outputText >Name : </apex:outputText><apex:outputField value="{!iPlayer.Name}"/> : <br/>
+        <apex:outputText >Email : </apex:outputText><apex:outputField value="{!iPlayer.Email__c}"/><br/>
+    </apex:pageBlock>
+    <apex:pageBlock title="All Your Future Games">    
+        <apex:pageBlockTable value="{!myFutureGames}" var="thisGame">
+            <apex:column value="{!thisGame.TournamentGame__c}"/>
+            <apex:column value="{!thisGame.Name}" />
+            <apex:column value="{!thisGame.Player_one__c}"/>
+            <apex:column value="{!thisGame.Player_two__c}"/>
+            <apex:column value="{!thisGame.FirstPlayerGoals__c}"/>
+            <apex:column value="{!thisGame.SecondPlayerGoals__c}"/>
+            <apex:column headerValue="Links to every game">
+                <apex:outputLink value="Game?id={!thisGame.Id}">Click here</apex:outputLink> 
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlock><br/>
+    <apex:outputLink value="Home">Home</apex:outputLink>
+</apex:page>

@@ -7,6 +7,7 @@
         <apex:pageblockSection title="Personal information about me">         
              <apex:outputField value="{!player.Name}"/> : <br/>
              <apex:outputField value="{!player.Email__c}"/>
+             <apex:outputLink value="PersonalPage">Personal page</apex:outputLink>
          </apex:pageblockSection> 
          <br/><apex:outputLink value="Logout" id="theLogoutLink">Logout</apex:outputLink><br/>
      </apex:pageBlock>
