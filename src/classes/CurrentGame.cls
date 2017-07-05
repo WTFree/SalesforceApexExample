@@ -1,4 +1,4 @@
-public class CurrentGame{
+public class CurrentGame implements ICurrentGame{
     
     public boolean writeResultThisMatch{get;set;}
     public boolean allowForAcceptPlayerOne{get;set;} 
