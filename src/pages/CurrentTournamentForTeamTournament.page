@@ -1,0 +1,11 @@
+<apex:page controller="CurrentTournament">
+    <apex:pageBlock title="It's Team tournament, that all fields which you can see now" rendered="{!currentTournament.Player_Type__c =='Team'}">
+        <apex:pageBlockSection columns="1" Title="All players who has registered at this tournament">    
+            <apex:pageBlockTable value="{!allRegisteredTeams}" var="thisTeam">
+                <apex:column value="{!thisTeam.Id}"/>
+                <apex:column value="{!thisTeam.Name}"/>
+            </apex:pageBlockTable>
+        </apex:pageBlockSection>
+        <apex:outputLink value="myTeam?id={!currentTournament.Id}">Manage your team for this tournament</apex:outputLink>
+    </apex:pageBlock>
+</apex:page>

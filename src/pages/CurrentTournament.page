@@ -1,0 +1,132 @@
+<apex:page controller="CurrentTournament" cache="false">
+    <apex:pageBlock rendered="{!currentTournament != null}">
+        <apex:pageMessages /> 
+        <apex:pageBlockSection columns="1">
+            <apex:outputField value="{!currentTournament.Name}"/>
+            <apex:outputField value="{!currentTournament.Start_Date__c}"/>
+            <apex:outputField value="{!currentTournament.End_Date__c}"/>
+            <apex:outputField value="{!currentTournament.Player_Type__c}"/>
+            <apex:outputField value="{!currentTournament.Type_of_Elimination_Tournament__c}"/>
+            <apex:outputField value="{!currentTournament.Status__c}"/>
+            <apex:pageBlock mode="maindetail" title="This block can see only moderator(link to update this tournament)" rendered="{!getStatusPlayer}">            
+                <apex:outputLink style="background-color: #f4427a;" value="UpdateTournament?id={!currentTournament.Id}">
+                    <apex:outputText title="this link can see only moderator" value="Update this tournament"/>
+                </apex:outputLink>
+            </apex:pageBlock>
+        </apex:pageBlockSection>
+<apex:pageBlock title="It's Single tournament, that all fields which you can see now" rendered="{!currentTournament.Player_Type__c =='Single'}">
+        <apex:pageBlockSection columns="1" Title="All players who has registered at this tournament">    
+            <apex:pageBlockTable value="{!allRegisteredPlayers}" var="thisPlayer">
+                <apex:column value="{!thisPlayer.Id}"/>
+                <apex:column value="{!thisPlayer.Name}"/>
+                <apex:column value="{!thisPlayer.Email__c}"/>
+            </apex:pageBlockTable>
+        </apex:pageBlockSection>
+        <apex:form rendered="{!checkCookie && currentTournament.Status__c = 'UPCOMING'}">
+            <apex:pageBlockSection columns="1" title="Sign in Tournament">
+                <apex:pageBlock rendered="{!checkRegistrationForTournir == false && getActualCountTounamentPlayers > 15}">
+                    You can't registeret at this tournament now 
+                </apex:pageBlock>
+                <apex:pageBlock rendered="{!checkRegistrationForTournir == false && getActualCountTounamentPlayers <16}">
+                    <apex:commandButton action="{!takeTournamentPart}" value="Take part in this tournament"/>
+                </apex:pageBlock>
+                <apex:pageBlock rendered="{!checkRegistrationForTournir}">
+                    <apex:commandButton action="{!RemoveTournamentPart}" value="Leave from this tournament"/><br/>
+                </apex:pageBlock>
+                <apex:pageBlock title="Start this tournament" rendered="{!getStatusPlayer}">
+                    <apex:commandButton action="{!startTournament}" value="Start"/>
+                </apex:pageBlock>
+            </apex:pageBlockSection>
+        </apex:form>
+        <apex:pageBlock title="All games at this tournament" mode="maindetail" rendered="{!checkCookie && actualTournamentType!='Single Elimination'&& (currentTournament.Status__c == 'IN PROGRESS' || currentTournament.Status__c=='COMPLETE')}">
+            <apex:pageBlockTable value="{!allCurrentGames}" var="thisGame">
+                <apex:column value="{!thisGame.Name}" rendered="{!getStatusPlayer}"/>
+                <apex:column value="{!thisGame.Player_one__c}"/>
+                <apex:column value="{!thisGame.Player_two__c}"/>
+                <apex:column value="{!thisGame.FirstPlayerGoals__c}"/>
+                <apex:column value="{!thisGame.SecondPlayerGoals__c}"/>
+                <apex:column value="{!thisGame.Stage__c}" rendered="{!actualTournamentType == 'Single Elimination'}"/>
+                <apex:column headerValue="Links to every game">
+                    <apex:outputLink value="Game?id={!thisGame.Id}">Click here</apex:outputLink> 
+                </apex:column>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+        <apex:form rendered="{!checkCookie && getStatusPlayer && currentTournament.Status__c = 'IN PROGRESS'}">
+            <apex:pageBlock title="Finish tournament">
+                <apex:commandButton action="{!finishTournament}" value="Finish this tournament"/> 
+            </apex:pageBlock> 
+        </apex:form>
+        <apex:pageblock title="Sign in Tournament" rendered="{!checkCookie==false}">
+            If you want sign in tournament, first that you need -> <apex:outputLink value="simpleLogin">sign in system</apex:outputLink>    
+        </apex:pageblock>
+        <apex:pageBlockSection columns="1" title="Single schedule tournament" rendered="{!actualTournamentType=='Single Elimination'}">
+            <apex:pageBlockTable value="{!singleEliminationGrid}" var="thisRound">
+                <apex:column >
+                    <apex:pageBlockTable value="{!thisRound}" var="thisGame">
+                        <apex:column value="{!thisGame.Name}" rendered="{!getStatusPlayer}"/>
+                        <apex:column value="{!thisGame.Player_one__c}"/>
+                        <apex:column value="{!thisGame.Player_two__c}"/>
+                        <apex:column value="{!thisGame.FirstPlayerGoals__c}"/>
+                        <apex:column value="{!thisGame.SecondPlayerGoals__c}"/>
+                        <apex:column value="{!thisGame.Stage__c}"/>
+                        <apex:column headerValue="Links to every game">
+                            <apex:outputLink value="Game?id={!thisGame.Id}">Click here</apex:outputLink> 
+                        </apex:column>
+                    </apex:pageBlockTable>    
+                </apex:column>
+             </apex:pageBlockTable>
+        </apex:pageBlockSection>
+        <apex:pageBlock rendered="{!actualTournamentType=='Double Elimination'}">
+            <apex:pageBlockTable value="{!allRegisteredPlayers}" var="thisPlayer">
+                <apex:column headerValue="Round 1">{!thisPlayer.Id} : {!thisPlayer.Name}</apex:column>
+                <apex:column headerValue="Round 2"></apex:column>
+                <apex:column headerValue="Round 3"></apex:column>x`>
+                <apex:column headerValue="Final"></apex:column>
+                <apex:column headerValue="Grand Final"></apex:column>                                
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+        <apex:pageBlock title="Final result" mode="maindetail" rendered="{!actualTournamentType=='Round-robin tournament'}">
+            <apex:pageBlockTable value="{!allRegisteredPlayers}" var="thisPlayer">
+                <apex:column headerValue="Player" width="270px">{!thisPlayer.Id} : {!thisPlayer.Name}</apex:column>
+                <apex:repeat value="{!allRegisteredPlayers}" var="thisOpponentPlayer">
+                    <apex:column >
+                        <apex:facet name="header">{!thisOpponentPlayer.Name}</apex:facet>
+                        <apex:pageBlock rendered="{!thisPlayer !=thisOpponentPlayer}">
+                            <center>+</center>
+                        </apex:pageBlock>
+                        <apex:pageBlock rendered="{!thisPlayer ==thisOpponentPlayer}">
+                            <center>-</center>
+                        </apex:pageBlock>
+                    </apex:column>
+                </apex:repeat>
+            </apex:pageBlockTable>
+            <apex:pageBlocktable value="{!RRGrid}" var="rrrg">
+                <apex:column >
+                    <apex:pageBlockTable value="{!rrrg}" var="thisrrrg">
+                        <apex:column >
+                            <apex:facet name="header">{!thisrrrg.FirstPlayerGoals__c}</apex:facet>
+                            <apex:outputText >{!thisrrrg.FirstPlayerGoals__c}</apex:outputText>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                </apex:column>
+            </apex:pageBlocktable>    
+        </apex:pageBlock>
+</apex:pageBlock> 
+<apex:pageBlock title="It's Team tournament, that all fields which you can see now" rendered="{!currentTournament.Player_Type__c =='Team'}">
+    <apex:include pageName="CurrentTournamentForTeamTournament"/>
+</apex:pageBlock>  
+        <apex:pageBlock title="Helpfull links">
+            <apex:outputLink value="RepresentTableTennisTournament">Tournaments List</apex:outputLink>
+            <br/>
+            <apex:outputLink value="home">HOME</apex:outputLink>
+        </apex:pageBlock>
+    </apex:pageBlock>
+    <apex:pageBlock rendered="{!currentTournament==null}">
+        This page don't avalieble for you
+        <apex:pageBlock title="Helpfull links">
+            <apex:outputLink value="RepresentTableTennisTournament">Tournaments List</apex:outputLink>
+            <br/>
+            <apex:outputLink value="home">HOME</apex:outputLink>
+        </apex:pageBlock>
+    </apex:pageBlock>
+</apex:page>

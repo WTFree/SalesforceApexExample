@@ -1,0 +1,26 @@
+<apex:page controller="CreateTournament">
+  <apex:pageBlock rendered="{!getStatusPlayer}" title="Tournament: {!currentTournament.name}">
+      <apex:form >
+        <apex:pageMessages /> <!-- this is where the error messages will appear -->
+        <apex:pageBlock title="Tournament Update">     
+            <apex:pageBlockSection showHeader="false" columns="2">
+                    <apex:inputField required="true" value="{!currentTournament.Name}" />
+                    <apex:inputField value="{!currentTournament.Start_Date__c}" />
+                    <apex:inputField value="{!currentTournament.End_Date__c}" />
+                    <apex:inputField value="{!currentTournament.Player_Type__c}" />
+                    <apex:inputField value="{!currentTournament.Type_of_Elimination_Tournament__c}" />
+                    <apex:inputField value="{!currentTournament.Status__c}" />
+              </apex:pageBlockSection>
+              <center><apex:commandButton action="{!updateTournament}" value="Update"/></center><br/>
+          </apex:pageBlock>
+      </apex:form>
+      <apex:form >
+          <apex:commandButton action="{!DeleteTournament}" value="Delete"/>
+      </apex:form>
+  </apex:pageBlock>
+  <apex:pageBlock rendered="{!getStatusPlayer == false}" title="Tournament"> 
+      <h1>You do not have allows for this function.</h1>    
+  </apex:pageBlock> 
+  <apex:outputLink value="CurrentTournament?id={!currentTournament.Id}">Go to this tournament</apex:outputLink><br/>
+  <apex:outputLink value="Home" id="theHomeLink">Go Home</apex:outputLink>
+</apex:page>

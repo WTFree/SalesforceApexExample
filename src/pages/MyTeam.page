@@ -1,0 +1,68 @@
+<apex:page controller="MyTeamClass">
+    <style type="text/css">
+        .buttonTeam {border-radius:5px;
+                cursor: pointer;
+                color: #fff;
+                background-color: #29c5e6;
+                border: none;
+                height: 30px;
+                font-family: 'Oswald', sans-serif; 
+        }
+        .buttonTeam{
+            position:relative;
+            overflow: hidden;
+            width:15%;
+        }
+        
+        .buttonTeam:after {
+            content: "";
+            background: #d1eeff;
+            display: block;
+            position: absolute;
+            padding-top: 300%;
+            padding-left: 350%;
+            margin-left: -20px !important;
+            margin-top: -120%;
+            opacity: 0;
+            transition: all 0.3s
+        }
+        
+        .buttonTeam:active:after {
+            padding: 0;
+            margin: 0;
+            opacity: 1;
+            transition: 0s
+        }
+        
+        .buttonTeam{   
+            box-shadow: 0 12px 6px -6px #666,0 0 3px 0 #ccc;
+        }
+    </style>
+
+    <apex:pageBlock mode="edit" title="Your team for tournament: {!currentTournament.Name}" rendered="{!tournamentId != null}">
+        <apex:form rendered="{!captaionOfThisTeam == false}">
+            <apex:message />
+            <apex:outputText > Team Name : </apex:outputText><apex:inputField required="true" value="{!myTeam.Name}"/><br/>
+            <apex:commandButton styleClass="buttonTeam" action="{!createTeam}" value="create"/>                
+        </apex:form>
+        <apex:pageBlock mode="edit" rendered="{!captaionOfThisTeam}">
+            <apex:form rendered="{!captaionOfThisTeamForThisTournament == false}">
+                <apex:message />
+                <apex:outputText > Choose your teammate : <br/></apex:outputText>
+                <apex:selectList value="{!selectedPlayer}" size="1" required="true">
+                    <apex:selectoptions value="{!playersOptions}" ></apex:selectoptions>
+                </apex:selectList>
+                <apex:commandButton styleClass="buttonTeam" action="{!joinToTournament}" value="Join to this tournament"/>
+            </apex:form>
+            <apex:pageBlock mode="maindetail" rendered="{!captaionOfThisTeamForThisTournament}">
+                <apex:pageBlockTable value="{!myTeamForThisTournament}" var="teammate">
+                    <apex:column value="{!teammate.Name}"/>
+                    <apex:column value="{!teammate.Email__c}"/>
+                </apex:pageBlockTable>
+            </apex:pageBlock>
+        </apex:pageBlock>
+    </apex:pageBlock>
+    <apex:outputLink value="CurrentTournament?id={!tournamentId}">Back to tournament<br/></apex:outputLink>
+    <apex:outputLink value="home">HOME</apex:outputLink>
+
+</apex:page>

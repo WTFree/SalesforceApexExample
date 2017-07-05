@@ -1,0 +1,32 @@
+<apex:page controller="SimpleController" id="HomePage" showHeader="true" cache="false">
+    <apex:pageBlock rendered="{!checkCookie == false}" title="Login/Registration">
+        <apex:outputLink value="simplelogin" id="theLoginLink">Login</apex:outputLink><br/>
+        <apex:outputLink value="SiteRegister" id="theRegisterLink">Register</apex:outputLink>
+     </apex:pageBlock>
+     <apex:pageBlock rendered="{!checkCookie}">
+        <apex:pageblockSection title="Personal information about me">         
+             <apex:outputField value="{!player.Name}"/> : <br/>
+             <apex:outputField value="{!player.Email__c}"/>
+         </apex:pageblockSection> 
+         <br/><apex:outputLink value="Logout" id="theLogoutLink">Logout</apex:outputLink><br/>
+     </apex:pageBlock>
+     <apex:pageBlock rendered="{!getStatusPlayer}" title="Tournament">
+         <apex:outputText >If you want to create tournament you must -> </apex:outputText>
+         <apex:outputLink value="CreateTournament" style="background-color: #f4427a;">click here</apex:outputLink>
+     </apex:pageBlock>
+     <apex:pageBlock title="Tournament in progress">    
+        <apex:pageBlockTable value="{!tournamentInProgress}" var="tournament">
+                <apex:column headerValue="Name"><apex:outputLink value="CurrentTournament?id={!tournament.id}">{!tournament.Name}</apex:outputLink></apex:column>
+                <apex:column value="{!tournament.Start_Date__c}"/>
+                <apex:column value="{!tournament.End_Date__c}"/>
+                <apex:column value="{!tournament.Player_Type__c}"/>
+                <apex:column value="{!tournament.Type_of_Elimination_Tournament__c}"/>
+                <apex:column value="{!tournament.Status__c}"/>
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+     <apex:pageBlock title="Helpfull links">
+         See all active Users : <apex:outputLink value="PlayerList" id="UsersListLink">Look For Your Team</apex:outputLink><br/>
+         My team : <apex:outputLink value="MyTeam" id="theRegisterLink">Check your team</apex:outputLink><br/>
+         See all torunaments : <apex:outputLink value="RepresentTableTennisTournament" id="theRepresentTableTournirTournamentLink">Watch all Tournaments</apex:outputLink><br/>
+     </apex:pageBlock>
+</apex:page>

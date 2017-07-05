@@ -1,0 +1,29 @@
+<apex:page controller="MyTeamClass">
+       
+    <apex:pageBlock title="Search Section">
+        <apex:pageBlockSection showHeader="false" columns="2">
+            <apex:form >
+                <apex:inputField value="{!playerBySearch.Email__c}" />
+                <apex:commandButton value="search" action="{!doSearch}"/>
+            </apex:form>
+        </apex:pageBlockSection>
+        <apex:pageBlock rendered="{!playerBySearch != null}" title="Your search result">
+            <apex:pageBlockTable value="{!playerBySearch}" var="p">
+                <apex:column value="{!p.Id}"/>
+                <apex:column value="{!p.Name}"/>
+                <apex:column value="{!p.Email__c}"/>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+    </apex:pageBlock>
+    <br/>
+    <apex:pageBlock title="Players">    
+        <apex:pageBlock rendered="{!allPlayers!= null}">    
+            <apex:pageBlockTable value="{!allPlayers}" var="p">
+                    <apex:column value="{!p.Id}"/>
+                    <apex:column value="{!p.Name}"/>
+                    <apex:column value="{!p.Email__c}"/>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+    </apex:pageBlock>        
+    <apex:outputLink value="Home" id="theHomeLink">Go Home</apex:outputLink><br/>  
+</apex:page>

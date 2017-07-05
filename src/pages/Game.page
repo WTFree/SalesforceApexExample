@@ -1,0 +1,39 @@
+<apex:page controller="CurrentGame" cache="false" rendered="{!currentGame !=null}">
+    <apex:pageBlock title="Tournament : {!currentTournament.Name} . {!currentGame.Name}">
+        <apex:pageBlock title="{!playerOne.Name}({!currentGame.FirstPlayerGoals__c}) VS {!playerTwo.Name}({!currentGame.SecondPlayerGoals__c})">
+        </apex:pageBlock>
+        <apex:pageBlockTable value="{!currentTournament}" var="thisTournament">
+            <apex:column value="{!thisTournament.Id}"/>
+            <apex:column value="{!thisTournament.Name}"/>
+            <apex:column value="{!thisTournament.Player_Type__c }"/>
+            <apex:column value="{!thisTournament.Type_of_Elimination_Tournament__c}"/>
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+    
+   <apex:form >
+        <apex:pageBlock title="Final result">
+        <apex:pageBlockButtons location="bottom" rendered="{!currentPlayer.isModerator__c || (currentTournament.Type_of_Elimination_Tournament__c =='Round-robin tournament' && currentGame.FirstPlayerGoals__c ==0 && currentGame.SecondPlayerGoals__c = 0 && writeResultThisMatch)}">
+            <apex:commandButton action="{!submitResult}" value="submit"/>
+        </apex:pageBlockButtons>        
+        <apex:pageBlockButtons location="bottom" rendered="{!currentPlayer.isModerator__c || (((allowForAcceptPlayerOne && currentGame.isFPAccepted__c ==false) || (allowForAcceptPlayerTwo && currentGame.isSPAccepted__c == false))&&  
+                                                            (currentTournament.Type_of_Elimination_Tournament__c =='Round-robin tournament'&& writeResultThisMatch && (currentGame.FirstPlayerGoals__c !=0 || currentGame.SecondPlayerGoals__c != 0)))}">
+        <apex:commandButton action="{!acceptResult}" value="accept result"/>
+            <apex:commandButton action="{!declineResult}" value="decline result"/>
+            <apex:commandButton action="{!moderatorAcceptResult}" value="moderator accept result" rendered="{!currentPlayer.isModerator__c}"/>
+            <apex:commandButton action="{!moderatorDeclineResult}" value="moderator decline result" rendered="{!currentPlayer.isModerator__c}"/>
+        </apex:pageBlockButtons>
+
+          <apex:pageBlockSection showHeader="false" columns="1" rendered="{!currentPlayer.isModerator__c || (currentGame.FirstPlayerGoals__c ==0 && currentGame.SecondPlayerGoals__c == 0 && writeResultThisMatch)}">
+            <apex:inputField required="true" value="{!currentGame.FirstPlayerGoals__c}"/>
+            <apex:inputField required="true" value="{!currentGame.SecondPlayerGoals__c}"/>
+          </apex:pageBlockSection>
+        
+          <apex:pageBlockSection showHeader="false" columns="1" rendered="{!currentPlayer.isModerator__c == false && (writeResultThisMatch == false||(currentGame.FirstPlayerGoals__c !=0 || currentGame.SecondPlayerGoals__c != 0))}">
+            <apex:outputField value="{!currentGame.FirstPlayerGoals__c}"/>
+            <apex:outputField value="{!currentGame.SecondPlayerGoals__c}"/>
+          </apex:pageBlockSection>
+        
+        </apex:pageBlock>
+  </apex:form>   <apex:outputLink value="CurrentTournament?id={!currentTournament.Id}">Back to this tournament</apex:outputLink><br/> 
+   <apex:outputLink value="home">Home</apex:outputLink> 
+</apex:page>

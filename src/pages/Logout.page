@@ -1,0 +1,2 @@
+<apex:page controller="SimpleController" id="LogoutPage" showHeader="false" action="{!logoutUser}">
+</apex:page>

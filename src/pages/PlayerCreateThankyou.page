@@ -1,0 +1,18 @@
+<apex:page controller="PlayerCreateController">  
+  <apex:sectionHeader title="Visualforce Example" subtitle="We send full instruction for activate on Your email, pls check in"/>
+
+  <apex:form >
+    <apex:pageBlock title="Contact Info">
+
+      <apex:pageBlockSection showHeader="false" columns="2">
+        <apex:outputField value="{!player.Name}" />
+        <apex:outputField value="{!player.Password__c}" />
+        <apex:outputField value="{!player.Email__c}" />
+      </apex:pageBlockSection>
+
+    </apex:pageBlock>
+    
+    <apex:outputLink value="home">HOME</apex:outputLink>
+
+  </apex:form>
+</apex:page>

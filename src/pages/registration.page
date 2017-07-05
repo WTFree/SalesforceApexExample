@@ -1,0 +1,2 @@
+<apex:page controller="ConfirmController" id="confirmRegistrationPage" showHeader="false" action="{!confirmRegistration}">
+</apex:page>

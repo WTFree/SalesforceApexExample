@@ -1,0 +1,33 @@
+<apex:page controller="CreateTournament">  
+  <apex:sectionHeader title="Visualforce Example" subtitle="Create a Tournament"/>
+     
+  <apex:pageBlock rendered="{!getStatusPlayer}" title="Tournament">
+      <apex:form >
+        <apex:pageMessages /> <!-- this is where the error messages will appear -->
+        <apex:pageBlock title="Tournament Create">     
+            <apex:pageBlockSection showHeader="false" columns="2">
+                    <apex:inputField required="true" value="{!tournament.Name}" />
+                    <apex:inputField value="{!tournament.Start_Date__c}" />
+                    <apex:inputField value="{!tournament.End_Date__c}" />
+                    <apex:inputField value="{!tournament.Player_Type__c}" />
+                    <apex:inputField value="{!tournament.Type_of_Elimination_Tournament__c}" />
+                    <apex:inputField value="{!tournament.Status__c}" />
+              </apex:pageBlockSection>
+              <apex:commandButton action="{!create}" value="Create"/>
+          </apex:pageBlock>
+      </apex:form>
+      <apex:pageBlock title="Update all tournaments">      
+              <apex:pageBlockTable value="{!allTournament}" var="tournament">
+                  <apex:column value="{!tournament.Name}"/>
+                  <apex:column value="{!tournament.Start_Date__c}"/>
+                  <apex:column value="{!tournament.End_Date__c}"/>
+                  <apex:column ><apex:outputLink value="UpdateTournament?id={!tournament.Id}">UPDATE IT</apex:outputLink></apex:column>
+              </apex:pageBlockTable>
+      </apex:pageBlock>  
+  </apex:pageBlock>  
+  <apex:pageBlock rendered="{!getStatusPlayer == false}" title="Tournament"> 
+      <h1>You do not have allows for this function.</h1>    
+  </apex:pageBlock> 
+  <apex:outputLink value="Home" id="theHomeLink">Go Home</apex:outputLink>
+  
+</apex:page>

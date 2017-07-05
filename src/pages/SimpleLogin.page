@@ -1,0 +1,24 @@
+<apex:page controller="SimpleController" cache="false">  
+  <apex:sectionHeader title="Visualforce Example" subtitle="Login like Player"/>
+  <apex:pageBlock rendered="{!checkCookie==false}" title="Tournament">
+  <apex:form >
+    <apex:pageMessages /> <!-- this is where the error messages will appear -->
+    <apex:pageBlock title="Player">
+    
+    <apex:pageBlockButtons >
+        <apex:commandButton action="{!loginUser}" value="Login"/>
+    </apex:pageBlockButtons>
+    
+      <apex:pageBlockSection showHeader="false" columns="2">
+        <apex:inputField value="{!player.Email__c}" />
+        <apex:inputSecret value="{!player.Password__c}" />
+      </apex:pageBlockSection>
+
+    </apex:pageBlock>
+  </apex:form>
+  </apex:pageBlock>
+  <apex:pageBlock rendered="{!checkCookie}" title="Tournament">
+      YOU HAVE ALREADY LOGIN
+  </apex:pageBlock>
+  <apex:outputlink value="home">HOME</apex:outputlink>
+</apex:page>
